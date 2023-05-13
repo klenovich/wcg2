@@ -1,0 +1,32 @@
+#city {
+  padding: 16px;
+  width: 100%;
+  height: 690px;
+  -webkit-filter: invert(50%);
+  filter: invert(50%);
+}
+
+#hy {
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  input[type=text], input[type=text]::placeholder {
+    color: #ccc;
+  }
+}
+
+.grid {
+  padding: 16px;
+}
+
+.sey-container {
+  margin: 6px 0;
+  background: var(--background-color);
+  box-shadow: none;
+}
+
+.sey-item {
+  margin-bottom: 0;
+  border-radius: 4px;
+}
