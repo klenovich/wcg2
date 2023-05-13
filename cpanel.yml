@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/dopeass.monster
+    - /bin/cp index.html $DEPLOYPATH
