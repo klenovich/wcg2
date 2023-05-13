@@ -6,6 +6,10 @@
     <meta name="description"
           content="Dope Ass Game!">
     <title>Total Beast Game!</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/horsey/4.2.2/horsey.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/picocss/1.5.7/pico.slim.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/horsey/4.2.2/horsey.min.css">
@@ -19,6 +23,7 @@
           <hgroup>
             <h1>Beast Game</h1>
             <h2>Choose a country, win the world! ⛳</h2>
+            <h2><span id="coin-display"></span></h2>
           </hgroup>
           <input type="text"
                  autofocus
@@ -30,7 +35,38 @@
           <img id="city" alt="shitbox" src="">
         </div>
       </article>
+      <div id="active-hat" class="active-hat"></div>
+      <div id="hat-inventory" class="hat-inventory"></div>  
+      <button id="open-hat-stock-market" class="open-hat-stock-market-button">📈 Open Hat Stock Market</button> 
+      <div id="hat-stock-market" class="hat-stock-market-overlay">
+        <button id="close-hat-stock-market" class="close-hat-stock-market-button">❌ Close</button>
+        <ul id="stock-ticker" class="stock-ticker">
+          <!-- Stock items will be created by JavaScript code -->
+        </ul>
+      </div>
+      
+      <div id="hat-store" class="hat-store">
+        <button class="close-hat-store">Close</button>
+        <div class="hat" data-id="hat1" data-price="5000">
+          <img src="https://cdn.shopify.com/s/files/1/0242/5431/products/brimless_big.jpg?v=1371778465" alt="Hat 1">
+          <h3>Hat 1</h3>
+          <p>Price: 5000 coins</p>
+          <button class="buy-hat">Buy</button>
+        </div>
+        <div class="hat" data-id="hat2" data-price="7000">
+          <img src="https://www.shutterstock.com/image-photo/stylish-fashion-elegant-hat-feathers-260nw-276276614.jpg" alt="Hat 2">
+          <h3>Hat 2</h3>
+          <p>Price: 7000 coins</p>
+          <button class="buy-hat">Buy</button>
+        </div>
+        <!-- add more hats as needed -->
+      </div>
+
+
     </main>
+
+
+
     <div style="bottom:0px;height:50px;padding-left:50px;">Funded by <a href="http://godchatcapital.com">God Chat Capital</a></div>
   </body>
 </html>
