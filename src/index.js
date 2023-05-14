@@ -12,7 +12,7 @@ window.onload = () => {
 
 horsey(GUESS_INPUT, { source: [{ list: cities.map(c => c.name) }], limit: 5 });
 
-let maxGuesses = 6;
+let maxGuesses = 5;
 
 const processGuess = (e) => {
   const city = e.target.value;
@@ -47,14 +47,10 @@ const processGuess = (e) => {
     GUESS_INPUT.value = "";
   }
 
-  if (e.which === 13) {
-    let isValidGuess = true;
-    maxGuesses--;
-
-    if (maxGuesses == 0) {
-      finishGuessBox(`The wright country is: ${target.name}.`);
-    }
+  if (maxGuesses == 0) {
+    finishGuessBox(`The wright country is: ${target.name}.`);
   }
+
 }
 
 const addTry = (msg, isInvalid) => {
@@ -70,11 +66,10 @@ const finishGuessBox = (msg) => {
   GUESS_INPUT.setAttribute("placeholder", msg);
   GUESS_INPUT.setAttribute("disabled", "true");
   GUESS_INPUT.value = "";
-  sharebuddy(initialGuesses - maxGuesses);
+  sharebuddy(initialGuesses);
 }
 
 const sharebuddy = (guessesTaken) => {
-  if (navigator.share) {
     const shareButton = document.createElement('button');
     shareButton.textContent = 'Share your result';
     shareButton.addEventListener('click', () => {
@@ -87,9 +82,7 @@ const sharebuddy = (guessesTaken) => {
     });
 
     document.querySelector("#tries").appendChild(shareButton);
-  } else {
-    console.warn("Web Share API is not supported in your browser.");
-  }
+
 };
 
 GUESS_INPUT.addEventListener("keyup", processGuess);
@@ -129,9 +122,7 @@ const updateCoinDisplay = (coins) => {
   document.querySelector("#coin-display").textContent = `Coins: ${coins}`; 
 }
 
-// ... your existing code including the updated coin system
 
-// Step 1: Add a button to open the hat store UI
 const openHatStoreButton = document.createElement('button');
 openHatStoreButton.textContent = 'Open Hat Store';
 openHatStoreButton.addEventListener('click', () => {
@@ -147,7 +138,7 @@ document.querySelectorAll(".buy-hat-stock").forEach(button => {
   });
 });
 
-// Update the buyHat function to handle buying hats from either the inventory or the stock market
+
 const buyHat = (hatPrice, hatId) => {
   if (coins >= hatPrice) {
     coins -= hatPrice;
@@ -183,7 +174,6 @@ for (const button of buyHatButtons) {
 }
 let hatsInventory = {};
 
-// Load the saved inventory, if it exists
 const inventoryCookie = getCookie("hatsInventory");
 if(inventoryCookie) {
   hatsInventory = JSON.parse(inventoryCookie);
@@ -191,7 +181,7 @@ if(inventoryCookie) {
 
 const displayInventory = () => {
   const inventoryElement = document.querySelector("#hat-inventory");
-  inventoryElement.innerHTML = ''; // Clear the current inventory display
+  inventoryElement.innerHTML = ''; 
 
   for (const hatId in hatsInventory) {
     const hatElement = document.createElement("div");
