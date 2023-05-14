@@ -3,11 +3,17 @@ import { getDistanceAndDirection } from './geo.js';
 
 let BULLSEYE = Math.floor(Math.random() * cities.length);
 const GUESS_INPUT = document.querySelector("input[id='hy']");
+let hatStockTicker;
+let hats = [];
+        let inventory = [];
+        const coinRange = { min: 50, max: 45000 };
 
 window.onload = () => {
   document.querySelector("#city")
     .setAttribute("src", `static/geo/${cities[BULLSEYE].code}.svg`);
   updateCoinDisplay(coins);
+  hatStockTicker = initHatStockTicker(10);
+  openHatStockMarket();
 }
 
 horsey(GUESS_INPUT, { source: [{ list: cities.map(c => c.name) }], limit: 5 });
@@ -247,270 +253,106 @@ const selectHat = (hatId, hatImagePath) => {
   activeHatElement.innerHTML = `<img src="${hatImagePath}" alt="Hat ${hatId}" class="hat-image">`;
 };
 
-// Step 3: Add a function to sell a hat for 50% of the original price
-const sellHat = (hatId, hatPrice) => {
-  if (hatsInventory[hatId] && hatsInventory[hatId] > 0) {
-    hatsInventory[hatId]--;
-    setCookie("hatsInventory", JSON.stringify(hatsInventory));
 
-    const sellPrice = Math.floor(hatPrice / 2);
-    coins += sellPrice;
-    setCookie("coins", coins);
-    updateCoinDisplay(coins);
-
-    alert(`You sold a hat: ${hatId}`);
-    displayInventory();
-  } else {
-    alert('You do not have this hat in your inventory!');
-  }
-};
-
-const updateSelectAndSellButtons = () => {
-  const selectHatButtons = document.querySelectorAll(".select-hat");
-  for (const button of selectHatButtons) {
-    button.addEventListener('click', () => {
-      const hatId = button.dataset.hatId;
-      const hatImagePath = button.dataset.hatImage;
-      selectHat(hatId, hatImagePath);
-    });
-  }
-
-  const sellHatButtons = document.querySelectorAll(".sell-hat");
-  for (const button of sellHatButtons) {
-    button.addEventListener('click', () => {
-      const hatId = button.dataset.hatId;
-      const hatPrice = parseInt(button.dataset.hatPrice, 10);
-      sellHat(hatId, hatPrice);
-    });
-  }
-};
-
-// Initialize event listeners for select and sell buttons
-updateSelectAndSellButtons();
-
-// ... your existing code including the hat store and inventory integration
-
-const stockTickerElement = document.querySelector("#stock-ticker");
-
-// Generate initial stock prices and populate stock ticker
-const hatStocks = {};
-for (let i = 1; i <= 10; i++) {
-  const initialPrice = getRandomInt(500, 15000);
-  const times = new Array(20).fill(0).map((_, idx) => idx * -5); // Last 10 minutes in 5-second intervals
-  hatStocks[`hat${i}`] = times.map(() => {
-    const priceChange = getRandomPercentageChange();
-    initialPrice *= (1 + priceChange);
-    return { price: Math.floor(initialPrice), timestamp: Date.now() - 5 * 60 * 1000 };
-  });
-  addHatStock(`hat${i}`, initialPrice);
-}
-
-// Update stock prices every 5 seconds
-setInterval(() => {
-  for (const hatId in hatStocks) {
-    const price = hatStocks[hatId][hatStocks[hatId].length - 1].price;
-    const newPrice = Math.floor(price * (1 + getRandomPercentageChange()));
-    hatStocks[hatId].push({ price: newPrice, timestamp: Date.now() });
-
-    document.querySelector(`#stock-${hatId} span`).textContent = `💲${newPrice.toLocaleString()}`;
-  }
-}, 5000);
-
-function addHatStock(hatId, price) {
-  const stockItem = document.createElement("li");
-  stockItem.id = `stock-${hatId}`;
-  stockItem.innerHTML = `
-    ${hatId} <span>💲${price.toLocaleString()}</span>
-    <button class="buy-hat-stock" data-hat-id="${hatId}" data-price="${price}">Buy</button>
-  `;
-  stockTickerElement.appendChild(stockItem);
-}
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-function getRandomPercentageChange() {
-  return (Math.random() * 0.04) - 0.02; // Random percentage change between -2% and 2%
-}
-
-hatElement.innerHTML = `
-  // ... your existing hatElement innerHTML code
-  <button class="tell-friends" data-hat-id="${hatId}" data-hat-name="${hatName}" data-hat-image="${hatImagePath}">📣 Tell my friends about this hat</button>
-`;
-
-// Inside the updateSelectAndSellButtons function
-const tellFriendsButtons = document.querySelectorAll(".tell-friends");
-for (const button of tellFriendsButtons) {
+document.querySelectorAll(".buy-hat").forEach((button) => {
   button.addEventListener("click", () => {
     const hatId = button.dataset.hatId;
-    const hatName = button.dataset.hatName;
-    const hatImagePath = button.dataset.hatImage;
+    const price = parseInt(button.dataset.price, 10);
+    if (price <= coins) {
+      if (hatsInventory[hatId]) {
+        hatsInventory[hatId]++;
+      } else {
+        hatsInventory[hatId] = 1;
+      }
 
-    if (navigator.share) {
-      navigator.share({
-        title: `Check out this cool ${hatName} I got on the hat game!`,
-        text: `I just bought a ${hatName} on the hat game! 🎩🤠`,
-        url: location.href
-      }).then(() => {
-        console.log("Successfully shared");
-      }).catch(error => {
-        console.error("Error sharing:", error);
+      coins -= price;
+      setCookie("coins", coins);
+      updateCoinDisplay(coins);
+      setCookie("hatsInventory", JSON.stringify(hatsInventory));
+      displayInventory();
+
+      alert(`You bought a ${hatId}`);
+    } else {
+      alert("Not enough coins!");
+    }
+  });
+});
+
+function updateStockTicker() {
+  const stockTicker = document.getElementById('stockTicker');
+  stockTicker.innerHTML = '';
+
+  for (let hat of hats) {
+      const listItem = document.createElement('li');
+      const buyButton = document.createElement('button');
+
+      buyButton.textContent = 'Buy';
+      buyButton.onclick = () => {
+          const hatIndex = inventory.findIndex(item => item.id === hat.id);
+          if (hatIndex !== -1) {
+              inventory[hatIndex].quantity += 1;
+          } else {
+              inventory.push({ ...hat, quantity: 1 });
+          }
+          coins -= hat.price;
+          setCookie("coins", coins);
+          updateCoinDisplay(coins);
+          updateInventory();
+      };
+      
+      listItem.textContent = `Hat ${hat.id + 1}: ${hat.price.toFixed(0)} coins `;
+      listItem.appendChild(buyButton);
+      stockTicker.appendChild(listItem);
+  }
+}
+
+function updateInventory() {
+  const inventoryList = document.getElementById('inventoryList');
+  inventoryList.innerHTML = '';
+
+  for (let hat of inventory) {
+      const listItem = document.createElement('li');
+      const sellButton = document.createElement('button');
+
+      listItem.textContent = `Hat ${hat.id + 1}: ${hat.price.toFixed(0)} coins x${hat.quantity} `;
+
+      sellButton.textContent = 'Sell';
+      sellButton.onclick = () => {
+          inventory[hat.id].quantity -= 1;
+          coins += hat.price;
+          setCookie("coins", coins);
+          updateCoinDisplay(coins);
+          if (!inventory[hat.id].quantity) {
+              inventory.splice(hat.id, 1);
+          }
+          updateInventory();
+      };
+      listItem.appendChild(sellButton);
+      inventoryList.appendChild(listItem);
+  }
+}
+
+function openHatStockMarket() {
+  document.getElementById('hatStockMarket').style.display = 'block';
+}
+
+function closeHatStockMarket() {
+  document.getElementById('hatStockMarket').style.display = 'none';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  createHats(coinRange);
+  const hatStockMarketButton = document.createElement('button');
+  hatStockMarketButton.textContent = 'Open Hat Stock Market';
+  hatStockMarketButton.onclick = openHatStockMarket;
+  document.body.appendChild(hatStockMarketButton);
+
+  setInterval(() => {
+      hats = hats.map(hat => {
+          const newPrice = updatePrices([hat.price])[0];
+          return { ...hat, price: newPrice };
       });
-    } else {
-      alert("Sharing is not supported on this browser.");
-    }
-  });
-}
-
-// ... your existing code including the hat store, inventory integration, and other features.
-
-// Helper functions for generating random hat prices and updating them
-const generateRandomPrice = () => {
-  return Math.floor(Math.random() * 14501) + 500;
-};
-
-const generateRandomPercentage = () => {
-  return Math.floor(Math.random() * 11) - 5;
-};
-
-const updateHatPrices = (prices) => {
-  return prices.map((price) => {
-    const percentageChange = 1 + generateRandomPercentage() / 100;
-    const newPrice = Math.round(price * percentageChange);
-    return Math.min(Math.max(500, newPrice), 15000);
-  });
-};
-
-// Initialize stock market display
-const hatStockMarket = document.querySelector("#hat-stock-market");
-const openHatStockMarket = document.querySelector("#open-hat-stock-market");
-const closeHatStockMarket = document.querySelector("#close-hat-stock-market");
-const stockTicker = document.querySelector("#stock-ticker");
-
-const initialPrices = Array.from({ length: 10 }, generateRandomPrice);
-for (let i = 0; i < 10; i++) {
-  const listItem = document.createElement("li");
-  listItem.innerHTML = `
-    Hat ${i + 1} <span id="hat${i + 1}-price">💲${initialPrices[i].toLocaleString()}</span>
-    <button class="buy-hat" data-hat-id="hat${i + 1}" data-price="${initialPrices[i]}">Buy</button>
-  `;
-  stockTicker.appendChild(listItem);
-}
-
-// Update the stock ticker prices every 5 seconds
-let stockPrices = initialPrices;
-setInterval(() => {
-  stockPrices = updateHatPrices(stockPrices);
-  for (let i = 1; i <= 10; i++) {
-    document.querySelector(`#hat${i}-price`).textContent = `💲${stockPrices[i - 1].toLocaleString()}`;
-  }
-}, 5000);
-
-// Add event listeners for opening and closing the hat stock market
-openHatStockMarket.addEventListener("click", () => {
-  hatStockMarket.style.display = "block";
+      updateStockTicker();
+  }, 5000);
+  updateStockTicker();
 });
-
-closeHatStockMarket.addEventListener("click", () => {
-  hatStockMarket.style.display = "none";
-});
-
-// Add an event listener for buying a hat
-document.querySelectorAll(".buy-hat").forEach((button) => {
-  button.addEventListener("click", () => {
-    const hatId = button.dataset.hatId;
-    const price = parseInt(button.dataset.price, 10);
-    if (price <= coins) {
-      if (hatsInventory[hatId]) {
-        hatsInventory[hatId]++;
-      } else {
-        hatsInventory[hatId] = 1;
-      }
-
-      coins -= price;
-      setCookie("coins", coins);
-      updateCoinDisplay(coins);
-      setCookie("hatsInventory", JSON.stringify(hatsInventory));
-      displayInventory();
-
-      alert(`You bought a ${hatId}`);
-    } else {
-      alert("Not enough coins!");
-    }
-  });
-});
-
-// Add the "Tell my friends about this hat" option to the hat inventory
-const shareHatWithFriends = (hatId, hatName) => {
-  if (navigator.share) {
-    navigator.share({
-      title: `Check out this cool ${hatName} I got on the hat game!`,
-      text: `I just bought a ${hatName} on the hat game! 🎩🤠`,
-      url: location.href
-    }).then(() => {
-      console.log("Successfully shared");
-    }).catch(error => {
-      console.error("Error sharing:", error);
-    });
-  } else {
-    alert("Sharing is not supported on this browser.");
-  }
-};
-
-// Update the displayInventory() function to include the "Tell my friends about this hat" button
-
-
-// Call the displayInventory() function to update the inventory display
-displayInventory();
-
-openHatStockMarket.addEventListener("click", () => {
-  hatStockMarket.style.display = "block";
-});
-
-closeHatStockMarket.addEventListener("click", () => {
-  hatStockMarket.style.display = "none";
-});
-
-// Add an event listener for buying a hat
-document.querySelectorAll(".buy-hat").forEach((button) => {
-  button.addEventListener("click", () => {
-    const hatId = button.dataset.hatId;
-    const price = parseInt(button.dataset.price, 10);
-    if (price <= coins) {
-      if (hatsInventory[hatId]) {
-        hatsInventory[hatId]++;
-      } else {
-        hatsInventory[hatId] = 1;
-      }
-
-      coins -= price;
-      setCookie("coins", coins);
-      updateCoinDisplay(coins);
-      setCookie("hatsInventory", JSON.stringify(hatsInventory));
-      displayInventory();
-
-      alert(`You bought a ${hatId}`);
-    } else {
-      alert("Not enough coins!");
-    }
-  });
-});
-
-// Hat animation function
-const animateHat = (hatImage) => {
-  const animationDuration = 500; // 500 milliseconds
-
-  const keyframes = [
-    { transform: 'scale(1)', offset: 0 },
-    { transform: 'scale(1.3)', offset: 0.5 },
-    { transform: 'scale(1)', offset: 1 }
-  ];
-
-  const animationOptions = {
-    duration: animationDuration,
-    iterations: Infinity
-  };
-
-  hatImage.animate(keyframes, animationOptions);
-};
