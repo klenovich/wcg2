@@ -59,7 +59,7 @@
     }
 
     function openHatStockMarket() {
-        document.getElementById('hatStockMarket').style.display = 'block';
+        document.getElementById('hatStockMarket').style.display = 'yes';
     }
 
     function closeHatStockMarket() {
