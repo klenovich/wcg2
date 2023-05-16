@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/horsey/4.2.2/horsey.min.css">
     <link rel="stylesheet" type="text/css" href="static/index.css" />
     <script type="module" src="src/index.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-base.min.js"></script>
     <!--<script type="module" src="src/stocks.js"></script>-->
   </head>
   <body>
@@ -24,7 +25,10 @@
           <hgroup>
             <h1>Beast Game</h1>
             <h2>Choose a country, win the world! ⛳</h2>
-            <h2><span id="coin-display"></span></h2>
+            <p><span id="coin-display"></span></p>
+            <p><span id="chump-display"></span></p>
+            <button onclick="openHatStockMarket()">Hat Stock Market!</button>
+            <button id="hbut">Hat Store</button>
           </hgroup>
           <input type="text"
                  autofocus
@@ -40,46 +44,55 @@
       <div id="hat-inventory" class="hat-inventory"></div>  
       
       
+      
       <div id="hat-store" class="hat-store">
         <button class="close-hat-store">Close</button>
         <div class="hat" data-id="hat1" data-price="5000">
           <img src="https://cdn.shopify.com/s/files/1/0242/5431/products/brimless_big.jpg?v=1371778465" alt="Hat 1">
           <h3>Hat 1</h3>
-          <p>Price: 5000 coins</p>
+          <p>Price: <div id="hat1px" style="display:inline;"></div> coins</p>
           <button class="buy-hat">Buy</button>
         </div>
         <div class="hat" data-id="hat2" data-price="7000">
           <img src="https://www.shutterstock.com/image-photo/stylish-fashion-elegant-hat-feathers-260nw-276276614.jpg" alt="Hat 2">
           <h3>Hat 2</h3>
-          <p>Price: 7000 coins</p>
+          <p>Price: <div id="hat2px" style="display:inline;"></div> coins</p>
           <button class="buy-hat">Buy</button>
         </div>
         <!-- add more hats as needed -->
       </div>
 
+      <div id="hatStockMarket" class="hat-stock-market" style="display: none;">
+        <button onclick="closeHatStockMarket()">Close</button>
+        <h1>Hat Stock Market 🎩 📈</h1>
+        <ul id="stockTicker"></ul>
+        <div id="container" style="height:50vh"></div>
+        <h3 style="margin:2px;">Hat 1 Price: $<div id="hat1p" style="display:inline;"></div></h3>
+        <h3 style="margin:2px;">Hat 2 Price: $<div id="hat2p" style="display:inline;"></div></h3>
+        <h3 style="margin:2px;">Hat 3 Price: $<div id="hat3p" style="display:inline;"></div></h3>
+        <h3 style="margin:2px;">Hat 4 Price: $<div id="hat4p" style="display:inline;"></div></h3>
+      </div>
+
+      
+
+      <div style="bottom:0px;height:50px;padding-left:50px;">Funded by <a href="http://godchatcapital.com">God Chat Capital</a></div>
 
     </main>
 
-    <div id="hatStockMarket" class="hat-stock-market">
-      <button onclick="closeHatStockMarket()">Close</button>
-      <h1>Hat Stock Market 🎩 📈</h1>
-      <ul id="stockTicker"></ul>
-  </div>
-  <div class="inventory">
-      <h1>Your Inventory 📦</h1>
-      <ul id="inventoryList"></ul>
-  </div>
+    
 
-    <div style="bottom:0px;height:50px;padding-left:50px;">Funded by <a href="http://godchatcapital.com">God Chat Capital</a></div>
+
+    
   </body>
 
   <script>
-
-
-
+      function openHatStockMarket() {
+        document.getElementById('hatStockMarket').style.display = 'block';
+      }
+      function closeHatStockMarket() {
+        document.getElementById('hatStockMarket').style.display = 'none';
+      }
+  </script>
 
   
-
-    
-</script>
 </html>

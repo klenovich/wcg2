@@ -98,7 +98,7 @@
   margin-top: 20px;
 }
 
-.hat-stock-market { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); padding: 1em; }
+.hat-stock-market { position: fixed; z-index: 10000; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); padding: 1em; }
     .hat-stock-market ul { list-style-type: none; padding-left: 0; }
     .hat-stock-market li { margin-bottom: 0.5em; }
     .inventory { margin-top: 1em; }

@@ -4,6 +4,7 @@ import { getDistanceAndDirection } from './geo.js';
 let BULLSEYE = Math.floor(Math.random() * cities.length);
 const GUESS_INPUT = document.querySelector("input[id='hy']");
 let hatStockTicker;
+var currentHatPrices = []
 let hats = [];
         let inventory = [];
         const coinRange = { min: 50, max: 45000 };
@@ -11,10 +12,45 @@ let hats = [];
 window.onload = () => {
   document.querySelector("#city")
     .setAttribute("src", `static/geo/${cities[BULLSEYE].code}.svg`);
+  
+  //geoFindMe();
   updateCoinDisplay(coins);
-  hatStockTicker = initHatStockTicker(10);
+  updateChumpDisplay(chumpChange);
+  beastModeGPS();
+  hatStockTicker = hatStockTicker(10);
   openHatStockMarket();
+  
 }
+
+function beastModeGPS() {
+fetch('https://extreme-ip-lookup.com/json/')
+.then( res => res.json())
+.then(res => {
+    console.log("Country: ", res.country);
+ })
+ .catch((data, status) => {
+    console.log('Request failed');
+ })
+}
+
+/*    Shit Sux
+
+function geoFindMe() {
+  if (!navigator.geolocation){
+   console.log("Geolocation is not supported by your browser");
+    return;
+  }
+  function success(position) {
+    var latitude  = position.coords.latitude;
+    var longitude = position.coords.longitude;
+    console.log(longitude, latitude)
+    reverseGeocodingWithGoogle(latitude, longitude)
+  }
+  function error() {
+    console.log("Unable to retrieve your location");
+  }
+  navigator.geolocation.getCurrentPosition(success, error);
+}*/
 
 horsey(GUESS_INPUT, { source: [{ list: cities.map(c => c.name) }], limit: 5 });
 
@@ -114,6 +150,8 @@ const getCookie = (cname) => {
   return "";
 }
 
+
+
 let coins = getCookie("coins");
 if (!coins) {
   coins = 100000;
@@ -124,12 +162,24 @@ if (!coins) {
 
 const coinCostPerGuess = 100;
 
+let chumpChange = getCookie("coins");
+if (!chumpChange) {
+  chumpChange = 1997;
+  setCookie("chumpChange", chumpChange);
+} else {
+  chumpChange = parseInt(chumpChange);
+}
+
 const updateCoinDisplay = (coins) => {
   document.querySelector("#coin-display").textContent = `Coins: ${coins}`; 
 }
 
+const updateChumpDisplay = (coins) => {
+  document.querySelector("#chump-display").textContent = `Chump Change: ${chumpChange}`; 
+}
 
-const openHatStoreButton = document.createElement('button');
+
+const openHatStoreButton = document.getElementById('hbut');
 openHatStoreButton.textContent = 'Open Hat Store';
 openHatStoreButton.addEventListener('click', () => {
   document.querySelector('#hat-store').classList.toggle('open');
@@ -209,7 +259,170 @@ const displayInventory = () => {
     inventoryElement.appendChild(hatElement);
   }
 
+  let priceHistory = [];
+
   
+  
+
+
+  console.log(priceHistory);
+
+
+
+  anychart.onDocumentReady(function () {
+
+    // create a data set on our data
+    var dataSet = anychart.data.set(
+
+    );
+  
+    // map data for the first series,
+    // take x from the zero column and value from the first column
+    var firstSeriesData = dataSet.mapAs({ x: 0, value: 1 });
+  
+    // map data for the second series,
+    // take x from the zero column and value from the second column
+    var secondSeriesData = dataSet.mapAs({ x: 0, value: 2 });
+  
+    // map data for the third series,
+    // take x from the zero column and value from the third column
+    var thirdSeriesData = dataSet.mapAs({ x: 0, value: 3 });
+    
+    // map data for the fourth series,
+    // take x from the zero column and value from the fourth column
+    var fourthSeriesData = dataSet.mapAs({ x: 0, value: 4 });
+  
+    // create a line chart
+    var chart = anychart.line();
+  
+    // configure the chart title text settings
+    //chart.title('Acceptance of same-sex relationships in the US over the last 2 decades');
+  
+    // set the y axis title
+    chart.yAxis().title('COINS');
+  
+    // create the first series with the mapped data
+    var firstSeries = chart.line(firstSeriesData);
+    firstSeries.name('Hat 1');
+  
+    // create the second series with the mapped data
+    var secondSeries = chart.line(secondSeriesData);
+    secondSeries.name('Hat 2');
+  
+    // create the third series with the mapped data
+    var thirdSeries = chart.line(thirdSeriesData);
+    thirdSeries.name('Hat 3');
+    
+     // create the fourth series with the mapped data
+    var fourthSeries = chart.line(fourthSeriesData);
+    fourthSeries.name('Hat 4');
+  
+    // turn the legend on
+    chart.legend().enabled(true);
+  
+    // set the container id for the line chart
+    chart.container('container');
+    
+    // draw the line chart
+    chart.draw();
+
+    function startPrice() {
+      const iprices = [];
+
+        for (let i = 1; i < 5; i++) {
+          const initialPrice = Math.floor(Math.random() * (15000 - 500)) + 500;
+          iprices.push(initialPrice); 
+          //console.log(initialPrice);
+          
+        }
+
+      return iprices;
+    }
+
+    const iprices = startPrice();
+    const currentTime = new Date().toLocaleTimeString();
+    const tuple = [currentTime, ...iprices.map(initalPrice => initalPrice)];
+    dataSet.append(tuple);
+
+    const hat1p = document.querySelector("#hat1p");
+    const hat2p = document.querySelector("#hat2p");
+    const hat3p = document.querySelector("#hat3p");
+    const hat4p = document.querySelector("#hat4p");
+    const hat1px = document.querySelector("#hat1px");
+    const hat2px = document.querySelector("#hat2px");
+    const hat3px = document.querySelector("#hat3px");
+    const hat4px = document.querySelector("#hat4px");
+    
+
+    //console.log(tuple)
+
+    function generateTuple() {
+      setInterval(() => {
+        const currentTime = new Date().toLocaleTimeString();
+        const tprice = [];
+        
+        for (let i = 2; i < 6; i++) {
+          const percentageChange = Math.random() * (0.05 - (-0.05)) + (-0.05);
+          const newPrice = tuple[i - 1] * (1 + percentageChange);
+          tprice.push(newPrice); 
+          //console.log(newPrice);
+        }
+        
+        var curT = [currentTime, ...tprice.map(newPrice => newPrice)];
+        currentHatPrices = curT;
+        dataSet.append(curT);
+        
+        console.log(curT);
+        hat1p.innerHTML = tprice[0].toFixed(2); 
+        hat2p.innerHTML = tprice[1].toFixed(2);
+        hat3p.innerHTML = tprice[2].toFixed(2);
+        hat4p.innerHTML = tprice[3].toFixed(2);
+        hat1px.innerHTML = tprice[0].toFixed(2); 
+        hat2px.innerHTML = tprice[1].toFixed(2);
+        hat3px.innerHTML = tprice[2].toFixed(2);
+        hat4px.innerHTML = tprice[3].toFixed(2);
+        
+        
+        
+        //priceHistory.push(tuple);
+    
+        
+        
+        //tuple.push(curT);
+        //console.log(tuple);
+        //dataSet.append(tuple);
+      }, 1000);
+    }
+  
+    generateTuple(); 
+    
+  });
+
+  console.log(currentHatPrices);
+  
+  
+  function getData() {
+    return [
+      ['1990',16.9,12.2,10.2,5.2],
+      ['1991',17,17.8,10,4.8],
+      ['1993',26.5,23.8,16.8,6.6],
+      ['1994',28.7,22,17.3,9.1],
+      ['1996',35.7,24,22.6,9.2],
+      ['1998',37.2,24.6,22.4,11.2],
+      ['2000',36.5,26.2,23.7,9.9],
+      ['2002',40,34.4,23.8,16.4],
+      ['2004',33.3,28.8,32.5,14.3],
+      ['2006',40.2,32.1,27.5,15.1],
+      ['2008',49.3,37.2,31.4,17.1],
+      ['2010',51.9,42.5,36.1,28.5],
+      ['2012',53.1,43.8,36,24.6],
+      ['2014',63.7,45.9,44.7,31.3],
+      ['2016',66.3,52,42.3,37.2],
+      ['2018',70.1,57.7,49.2,39]
+    ];
+  }
+
+
 
   for (const hatId in hatsInventory) {
     const hatElement = document.createElement("div");
@@ -332,13 +545,7 @@ function updateInventory() {
   }
 }
 
-function openHatStockMarket() {
-  document.getElementById('hatStockMarket').style.display = 'block';
-}
 
-function closeHatStockMarket() {
-  document.getElementById('hatStockMarket').style.display = 'none';
-}
 
 window.addEventListener('DOMContentLoaded', () => {
   createHats(coinRange);
