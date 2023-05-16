@@ -3,8 +3,8 @@ import { getDistanceAndDirection } from './geo.js';
 
 let BULLSEYE = Math.floor(Math.random() * cities.length);
 const GUESS_INPUT = document.querySelector("input[id='hy']");
-let hatStockTicker;
 var currentHatPrices = []
+let maxGuesses = 5;
 let hats = [];
         let inventory = [];
         const coinRange = { min: 50, max: 45000 };
@@ -16,54 +16,87 @@ window.onload = () => {
   //geoFindMe();
   updateCoinDisplay(coins);
   updateChumpDisplay(chumpChange);
-  beastModeGPS();
-  hatStockTicker = hatStockTicker(10);
-  openHatStockMarket();
+  hatStoc();
   
 }
 
-function beastModeGPS() {
-fetch('https://extreme-ip-lookup.com/json/')
-.then( res => res.json())
-.then(res => {
-    console.log("Country: ", res.country);
- })
- .catch((data, status) => {
-    console.log('Request failed');
- })
+// Coins ---------
+//       -------
+
+    // Cookies -------
+
+const setCookie = (cname, cvalue) => {
+  document.cookie = `${cname}=${cvalue};path=/`;
 }
 
-/*    Shit Sux
-
-function geoFindMe() {
-  if (!navigator.geolocation){
-   console.log("Geolocation is not supported by your browser");
-    return;
+const getCookie = (cname) => {
+  const name = `${cname}=`;
+  const cookies = document.cookie.split(';');
+  
+  for(let cookie of cookies) {
+    while (cookie.charAt(0) == ' ') {
+      cookie = cookie.substring(1);
+    }
+    if (cookie.indexOf(name) == 0) {
+      return cookie.substring(name.length, cookie.length);
+    }
   }
-  function success(position) {
-    var latitude  = position.coords.latitude;
-    var longitude = position.coords.longitude;
-    console.log(longitude, latitude)
-    reverseGeocodingWithGoogle(latitude, longitude)
-  }
-  function error() {
-    console.log("Unable to retrieve your location");
-  }
-  navigator.geolocation.getCurrentPosition(success, error);
-}*/
+  
+  return "";
+}
 
-horsey(GUESS_INPUT, { source: [{ list: cities.map(c => c.name) }], limit: 5 });
+    //Coins -------
 
-let maxGuesses = 5;
+let coins = getCookie("coins");
+if (!coins) {
+  coins = 100000;
+  setCookie("coins", coins);
+} else {
+  coins = parseInt(coins);
+}
+
+const coinCostPerGuess = 100;
+
+    // Chump Change!
+
+let chumpChange = getCookie("chumpChange");
+if (!chumpChange) {
+  chumpChange = 1997;
+  setCookie("chumpChange", chumpChange);
+} else {
+  chumpChange = parseInt(chumpChange);
+}
+
+const chumpPerGuess = 1;
+
+    // Displays
+
+const updateCoinDisplay = (coins) => {
+  document.querySelector("#coin-display").textContent = `Coins: ${coins}`; 
+}
+
+const updateChumpDisplay = (chumpChange) => {
+  document.querySelector("#chump-display").textContent = `Chump Change: ${chumpChange}`; 
+}
+
+
+//  ------------------
+//    Original Game
+//  ------------------
+
+horsey(GUESS_INPUT, { source: [{ list: cities.map(c => c.name) }], limit: maxGuesses });
 
 const processGuess = (e) => {
   const city = e.target.value;
-  if (e.key != "Enter" || city === '' || coins < coinCostPerGuess)
+  if (e.key != "Enter" || city === '' || coins < coinCostPerGuess || chumpChange < chumpPerGuess)
     return;
 
   coins -= coinCostPerGuess;
+  chumpChange -= chumpPerGuess;
   setCookie("coins", coins);
   updateCoinDisplay(coins);
+  setCookie("chumpChange", chumpChange);
+  updateChumpDisplay(chumpChange);
 
   const guess = cities.filter(c => city === c.name)[0];
   const target = cities[BULLSEYE];
@@ -129,146 +162,10 @@ const sharebuddy = (guessesTaken) => {
 
 GUESS_INPUT.addEventListener("keyup", processGuess);
 
-// Coin system
-const setCookie = (cname, cvalue) => {
-  document.cookie = `${cname}=${cvalue};path=/`;
-}
+// ----
+//    Stock MArket
 
-const getCookie = (cname) => {
-  const name = `${cname}=`;
-  const cookies = document.cookie.split(';');
-  
-  for(let cookie of cookies) {
-    while (cookie.charAt(0) == ' ') {
-      cookie = cookie.substring(1);
-    }
-    if (cookie.indexOf(name) == 0) {
-      return cookie.substring(name.length, cookie.length);
-    }
-  }
-  
-  return "";
-}
-
-
-
-let coins = getCookie("coins");
-if (!coins) {
-  coins = 100000;
-  setCookie("coins", coins);
-} else {
-  coins = parseInt(coins);
-}
-
-const coinCostPerGuess = 100;
-
-let chumpChange = getCookie("coins");
-if (!chumpChange) {
-  chumpChange = 1997;
-  setCookie("chumpChange", chumpChange);
-} else {
-  chumpChange = parseInt(chumpChange);
-}
-
-const updateCoinDisplay = (coins) => {
-  document.querySelector("#coin-display").textContent = `Coins: ${coins}`; 
-}
-
-const updateChumpDisplay = (coins) => {
-  document.querySelector("#chump-display").textContent = `Chump Change: ${chumpChange}`; 
-}
-
-
-const openHatStoreButton = document.getElementById('hbut');
-openHatStoreButton.textContent = 'Open Hat Store';
-openHatStoreButton.addEventListener('click', () => {
-  document.querySelector('#hat-store').classList.toggle('open');
-});
-document.body.appendChild(openHatStoreButton);
-
-document.querySelectorAll(".buy-hat-stock").forEach(button => {
-  button.addEventListener("click", () => {
-    const hatId = button.dataset.hatId;
-    const price = parseInt(button.dataset.price);
-    buyHat(price, hatId);
-  });
-});
-
-
-const buyHat = (hatPrice, hatId) => {
-  if (coins >= hatPrice) {
-    coins -= hatPrice;
-    setCookie("coins", coins);
-    updateCoinDisplay(coins);
-
-    if(hatsInventory[hatId]) {
-      hatsInventory[hatId]++;
-    } else {
-      hatsInventory[hatId] = 1;
-    }
-    setCookie("hatsInventory", JSON.stringify(hatsInventory));
-    displayInventory();
-
-    alert(`You bought a hat: ${hatId}`);
-  } else {
-    alert('Not enough coins!');
-  }
-};
-
-document.querySelector('.close-hat-store').addEventListener('click', () => {
-  document.querySelector('#hat-store').classList.remove('open');
-});
-
-const buyHatButtons = document.querySelectorAll('.buy-hat');
-for (const button of buyHatButtons) {
-  button.addEventListener('click', (e) => {
-    const hatElement = e.target.parentElement;
-    const hatId = hatElement.dataset.id;
-    const hatPrice = parseInt(hatElement.dataset.price, 10);
-    buyHat(hatPrice, hatId);
-  });
-}
-let hatsInventory = {};
-
-const inventoryCookie = getCookie("hatsInventory");
-if(inventoryCookie) {
-  hatsInventory = JSON.parse(inventoryCookie);
-}
-
-const displayInventory = () => {
-  const inventoryElement = document.querySelector("#hat-inventory");
-  inventoryElement.innerHTML = ''; 
-
-  for (const hatId in hatsInventory) {
-    const hatElement = document.createElement("div");
-    hatElement.classList.add("hat-item");
-
-    const hatCount = hatsInventory[hatId];
-    const hatDataElement = document.querySelector(`.hat[data-id="${hatId}"]`);
-    const hatName = hatDataElement.querySelector("h3").textContent;
-    const hatImagePath = hatDataElement.querySelector("img").src;
-
-    hatElement.innerHTML = `
-      <img src="${hatImagePath}" alt="${hatName}" class="hat-image">
-      <strong>Hat: </strong> ${hatName}<br>
-      <strong>Quantity: </strong> ${hatCount}<br>
-      <button class="select-hat" data-hat-id="${hatId}" data-hat-image="${hatImagePath}">Select</button> 
-      <button class="sell-hat" data-hat-id="${hatId}" data-hat-price="${hatDataElement.dataset.price}">Sell</button>
-    `;
-
-    inventoryElement.appendChild(hatElement);
-  }
-
-  let priceHistory = [];
-
-  
-  
-
-
-  console.log(priceHistory);
-
-
-
+const hatStoc = () => {
   anychart.onDocumentReady(function () {
 
     // create a data set on our data
@@ -330,9 +227,9 @@ const displayInventory = () => {
       const iprices = [];
 
         for (let i = 1; i < 5; i++) {
-          const initialPrice = Math.floor(Math.random() * (15000 - 500)) + 500;
+          const initialPrice = Math.floor(Math.random() * (10000 - 2000)) + 2000;
           iprices.push(initialPrice); 
-          //console.log(initialPrice);
+          console.log(initialPrice);
           
         }
 
@@ -421,7 +318,91 @@ const displayInventory = () => {
       ['2018',70.1,57.7,49.2,39]
     ];
   }
+}
 
+
+
+const openHatStoreButton = document.getElementById('hbut');
+openHatStoreButton.textContent = 'Open Hat Store';
+openHatStoreButton.addEventListener('click', () => {
+  document.querySelector('#hat-store').classList.toggle('open');
+});
+document.body.appendChild(openHatStoreButton);
+
+document.querySelectorAll(".buy-hat-stock").forEach(button => {
+  button.addEventListener("click", () => {
+    const hatId = button.dataset.hatId;
+    const price = parseInt(button.dataset.price);
+    buyHat(price, hatId);
+  });
+});
+
+
+const buyHat = (hatPrice, hatId) => {
+  if (coins >= hatPrice) {
+    coins -= hatPrice;
+    setCookie("coins", coins);
+    updateCoinDisplay(coins);
+
+    if(hatsInventory[hatId]) {
+      hatsInventory[hatId]++;
+    } else {
+      hatsInventory[hatId] = 1;
+    }
+    setCookie("hatsInventory", JSON.stringify(hatsInventory));
+    displayInventory();
+
+    alert(`You bought a hat: ${hatId}`);
+  } else {
+    alert('Not enough coins!');
+  }
+};
+
+document.querySelector('.close-hat-store').addEventListener('click', () => {
+  document.querySelector('#hat-store').classList.remove('open');
+});
+
+const buyHatButtons = document.querySelectorAll('.buy-hat');
+for (const button of buyHatButtons) {
+  button.addEventListener('click', (e) => {
+    const hatElement = e.target.parentElement;
+    const hatId = hatElement.dataset.id;
+    const hatPrice = parseInt(hatElement.dataset.price, 10);
+    buyHat(hatPrice, hatId);
+  });
+}
+let hatsInventory = {};
+
+const inventoryCookie = getCookie("hatsInventory");
+if(inventoryCookie) {
+  hatsInventory = JSON.parse(inventoryCookie);
+}
+
+const displayInventory = () => {
+  const inventoryElement = document.querySelector("#hat-inventory");
+  inventoryElement.innerHTML = ''; 
+
+  for (const hatId in hatsInventory) {
+    const hatElement = document.createElement("div");
+    hatElement.classList.add("hat-item");
+
+    const hatCount = hatsInventory[hatId];
+    const hatDataElement = document.querySelector(`.hat[data-id="${hatId}"]`);
+    const hatName = hatDataElement.querySelector("h3").textContent;
+    const hatImagePath = hatDataElement.querySelector("img").src;
+
+    hatElement.innerHTML = `
+      <img src="${hatImagePath}" alt="${hatName}" class="hat-image">
+      <strong>Hat: </strong> ${hatName}<br>
+      <strong>Quantity: </strong> ${hatCount}<br>
+      <button class="select-hat" data-hat-id="${hatId}" data-hat-image="${hatImagePath}">Select</button> 
+      <button class="sell-hat" data-hat-id="${hatId}" data-hat-price="${hatDataElement.dataset.price}">Sell</button>
+    `;
+
+    inventoryElement.appendChild(hatElement);
+  }
+
+  let priceHistory = [];
 
 
   for (const hatId in hatsInventory) {
