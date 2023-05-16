@@ -72,11 +72,11 @@ const chumpPerGuess = 1;
     // Displays
 
 const updateCoinDisplay = (coins) => {
-  document.querySelector("#coin-display").textContent = `Coins: ${coins}`; 
+  document.querySelector("#coin-display").textContent = `Coins: ${coins.toFixed(2)}`; 
 }
 
 const updateChumpDisplay = (chumpChange) => {
-  document.querySelector("#chump-display").textContent = `Chump Change: ${chumpChange}`; 
+  document.querySelector("#chump-display").textContent = `Chump Change: ${chumpChange.toFixed(2)}`; 
 }
 
 
@@ -298,26 +298,6 @@ const hatStoc = () => {
   console.log(currentHatPrices);
   
   
-  function getData() {
-    return [
-      ['1990',16.9,12.2,10.2,5.2],
-      ['1991',17,17.8,10,4.8],
-      ['1993',26.5,23.8,16.8,6.6],
-      ['1994',28.7,22,17.3,9.1],
-      ['1996',35.7,24,22.6,9.2],
-      ['1998',37.2,24.6,22.4,11.2],
-      ['2000',36.5,26.2,23.7,9.9],
-      ['2002',40,34.4,23.8,16.4],
-      ['2004',33.3,28.8,32.5,14.3],
-      ['2006',40.2,32.1,27.5,15.1],
-      ['2008',49.3,37.2,31.4,17.1],
-      ['2010',51.9,42.5,36.1,28.5],
-      ['2012',53.1,43.8,36,24.6],
-      ['2014',63.7,45.9,44.7,31.3],
-      ['2016',66.3,52,42.3,37.2],
-      ['2018',70.1,57.7,49.2,39]
-    ];
-  }
 }
 
 
@@ -338,7 +318,8 @@ document.querySelectorAll(".buy-hat-stock").forEach(button => {
 });
 
 
-const buyHat = (hatPrice, hatId) => {
+const buyHat = (hatId) => {
+  const hatPrice = currentHatPrices[hatId];
   if (coins >= hatPrice) {
     coins -= hatPrice;
     setCookie("coins", coins);
@@ -358,6 +339,27 @@ const buyHat = (hatPrice, hatId) => {
   }
 };
 
+const sellHat = (hatId) => {
+  if(hatsInventory[hatId]) {
+    hatsInventory[hatId]++;
+  
+    let hatPrice = currentHatPrices[hatId];
+    coins += hatPrice;
+    setCookie("coins", coins);
+    updateCoinDisplay(coins);
+
+    alert(`You sold a hat: ${hatId} for ${hatPrice}`);
+    hatsInventory[hatId] = 0;
+    setCookie("hatsInventory", JSON.stringify(hatsInventory));
+    displayInventory();
+    
+    
+    
+  } else {
+    alert('You aint own');
+  }
+};
+
 document.querySelector('.close-hat-store').addEventListener('click', () => {
   document.querySelector('#hat-store').classList.remove('open');
 });
@@ -367,8 +369,8 @@ for (const button of buyHatButtons) {
   button.addEventListener('click', (e) => {
     const hatElement = e.target.parentElement;
     const hatId = hatElement.dataset.id;
-    const hatPrice = parseInt(hatElement.dataset.price, 10);
-    buyHat(hatPrice, hatId);
+    
+    buyHat(hatId);
   });
 }
 let hatsInventory = {};
