@@ -182,59 +182,23 @@ GUESS_INPUT.addEventListener("keyup", processGuess);
 const hatStoc = () => {
   anychart.onDocumentReady(function () {
 
-    // create a data set on our data
-    var dataSet = anychart.data.set(
-
-    );
-  
-    // map data for the first series,
-    // take x from the zero column and value from the first column
+    var dataSet = anychart.data.set( );
     var firstSeriesData = dataSet.mapAs({ x: 0, value: 1 });
-  
-    // map data for the second series,
-    // take x from the zero column and value from the second column
     var secondSeriesData = dataSet.mapAs({ x: 0, value: 2 });
-  
-    // map data for the third series,
-    // take x from the zero column and value from the third column
     var thirdSeriesData = dataSet.mapAs({ x: 0, value: 3 });
-    
-    // map data for the fourth series,
-    // take x from the zero column and value from the fourth column
     var fourthSeriesData = dataSet.mapAs({ x: 0, value: 4 });
-  
-    // create a line chart
     var chart = anychart.line();
-  
-    // configure the chart title text settings
-    //chart.title('Acceptance of same-sex relationships in the US over the last 2 decades');
-  
-    // set the y axis title
     chart.yAxis().title('COINS');
-  
-    // create the first series with the mapped data
     var firstSeries = chart.line(firstSeriesData);
     firstSeries.name('Hat 1');
-  
-    // create the second series with the mapped data
     var secondSeries = chart.line(secondSeriesData);
     secondSeries.name('Hat 2');
-  
-    // create the third series with the mapped data
     var thirdSeries = chart.line(thirdSeriesData);
     thirdSeries.name('Hat 3');
-    
-     // create the fourth series with the mapped data
     var fourthSeries = chart.line(fourthSeriesData);
     fourthSeries.name('Hat 4');
-  
-    // turn the legend on
     chart.legend().enabled(true);
-  
-    // set the container id for the line chart
     chart.container('container');
-    
-    // draw the line chart
     chart.draw();
 
     function startPrice() {
