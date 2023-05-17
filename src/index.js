@@ -76,7 +76,7 @@ const updateCoinDisplay = (coins) => {
 }
 
 const updateChumpDisplay = (chumpChange) => {
-  document.querySelector("#chump-display").textContent = `Chump Change: ${chumpChange.toFixed(2)}`; 
+  document.querySelector("#chump-display").textContent = `Chump Change: ${chumpChange.toFixed(0)}`; 
 }
 
 
@@ -88,6 +88,8 @@ horsey(GUESS_INPUT, { source: [{ list: cities.map(c => c.name) }], limit: maxGue
 
 const processGuess = (e) => {
   const city = e.target.value;
+  const numGue = 0;
+  const disArray = [];
   if (e.key != "Enter" || city === '' || coins < coinCostPerGuess || chumpChange < chumpPerGuess)
     return;
 
@@ -100,30 +102,41 @@ const processGuess = (e) => {
 
   const guess = cities.filter(c => city === c.name)[0];
   const target = cities[BULLSEYE];
+  //
 
   if (guess === undefined)
     return;
 
   if (guess === target) {
     addTry(city, "false");
+    //sharebuddy(++numGue, disArray);
     finishGuessBox("Dope ass job! Ya got it right buddy!");
+    
     return;
   }
 
   if (guess !== target) {
     const [distance, direction] = getDistanceAndDirection(guess, target);
     const msg = `${city} (${direction} ${distance.toFixed(2)} micro meters)`;
-
+    
     addTry(msg, "true");
+    
     --maxGuesses;
+    //numGue += 1;
+    
+    //blox = ((500 - distance.toFixed(0))/10);
+    //disArray.push(blox);
 
     GUESS_INPUT.setAttribute("placeholder",
         `You got ${maxGuesses} guesse(s), buddy.`);
     GUESS_INPUT.value = "";
+    
   }
 
   if (maxGuesses == 0) {
+    //sharebuddy(numGue, disArray);
     finishGuessBox(`The wright country is: ${target.name}.`);
+    
   }
 
 }
@@ -141,17 +154,18 @@ const finishGuessBox = (msg) => {
   GUESS_INPUT.setAttribute("placeholder", msg);
   GUESS_INPUT.setAttribute("disabled", "true");
   GUESS_INPUT.value = "";
-  sharebuddy(initialGuesses);
+  
 }
 
-const sharebuddy = (guessesTaken) => {
-    const shareButton = document.createElement('button');
+const sharebuddy = (numGue, disArray) => {
+    const shareButton = document.getElementById('shareBox')
+    shareButton.style.display = 'block';
     shareButton.textContent = 'Share your result';
     shareButton.addEventListener('click', () => {
-      const emojiBlocks = '🧱'.repeat(guessesTaken);
+      const emojiBlocks = '🧱'.repeat(numGue);
       navigator.share({
         title: 'Beast!',
-        text: `I'M ADDICTED to this DOPE ASS GAME and took ${guessesTaken} guesses (${emojiBlocks}) in the hopes to win it all! Huzzah!`,
+        text: `I'M ADDICTED to this DOPE ASS GAME and took ${numGue} guesses (${emojiBlocks}) in the hopes to win it all! Huzzah!`,
         url: window.location.href,
       });
     });
@@ -403,8 +417,6 @@ const displayInventory = () => {
 
     inventoryElement.appendChild(hatElement);
   }
-
-  let priceHistory = [];
 
 
   for (const hatId in hatsInventory) {
