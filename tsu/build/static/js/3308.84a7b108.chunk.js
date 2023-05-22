@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkworldle=self.webpackChunkworldle||[]).push([[3308],{63308:function(e,c,s){e.exports=s.p+"static/media/vector.9b01d9ec72ddc0e7e369.svg"}}]);

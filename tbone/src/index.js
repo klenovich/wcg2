@@ -11,7 +11,7 @@ let hats = [];
 
 window.onload = () => {
   document.querySelector("#city")
-    .setAttribute("src", `static/geo/${cities[BULLSEYE].code}.svg`);
+   //.setAttribute("src", `static/geo/${cities[BULLSEYE].code}.svg`);
   
   //geoFindMe();
   updateCoinDisplay(coins);
