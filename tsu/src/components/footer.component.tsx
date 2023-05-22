@@ -1,5 +1,3 @@
-import { SiLinkedin, SiGithub, SiTwitter } from "react-icons/si";
-import { CgWebsite } from "react-icons/cg";
 
 const Footer = () => {
   return (
