@@ -1,14 +1,7 @@
-/*
- * GRS 1980 is the ellipsoid of SIRGAS 2000 [1], the coordinate reference
- * system used as the basis for the data obtained from the Brazilian
- * government.
- *
- * The constants below were obtained from [2] and are, respectively,
- * the equatorial radius (a) and square of first eccentricity (e^2).
- *
- * [1] https://epsg.io/4674
- * [2] https://archive.is/FfUv5
- */
+
+// https://epsg.io/4674
+// https://archive.is/FfUv5
+
 const GRS_1980_A = 6378.137
 const GRS_1980_E_POW_2 = 0.006694380022903415749574948586289306212443890
 
@@ -46,7 +39,7 @@ class City {
     [this.x, this.y, this.z] = this.geodeticToEcef(rawCity.lat, rawCity.lon);
   }
 
-  // based on https://en.wikipedia.org/wiki/Geographic_coordinate_conversion
+  // https://en.wikipedia.org/wiki/Geographic_coordinate_conversion
   geodeticToEcef(latDeg, lonDeg, h = 0) {
     const [lat, lon] = [degToRad(latDeg), degToRad(lonDeg)];
     const [cosLat, sinLat] = [Math.cos(lat), Math.sin(lat)];
@@ -59,14 +52,14 @@ class City {
     ];
   }
 
-  // Euclidean distance in 3D
+
   distanceFrom(o) {
     return Math.sqrt(
       (o.x - this.x) ** 2 + (o.y - this.y) ** 2 + (o.z - this.z) ** 2
     );
   }
 
-  // based on https://gis.stackexchange.com/a/58926
+  // https://gis.stackexchange.com/a/58926
   azimuthFrom(o) {
     const [dx, dy, dz] = [o.x - this.x, o.y - this.y, o.z - this.z];
     const sumDeltaSq = dx**2 + dy**2 + dz**2;
@@ -87,3 +80,6 @@ export const getDistanceAndDirection = (rawGuess, rawTarget) => {
   const target = new City(rawTarget);
   return [guess.distanceFrom(target), degToDir(guess.azimuthFrom(target))];
 }
+
+brazil = ["name": "Brazil",-14.235004, -51.92528]
+console.log(getDistanceAndDirection(,))
