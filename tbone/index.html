@@ -14,8 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/picocss/1.5.7/pico.slim.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/horsey/4.2.2/horsey.min.css">
     <link rel="stylesheet" type="text/css" href="static/index.css" />
+
     <script type="module" src="src/index.js"></script>
-    <script src="https://cdn.anychart.com/releases/8.10.0/js/anychart-base.min.js"></script>
+
     <!--<script type="module" src="src/stocks.js"></script>-->
   </head>
   <body>
@@ -80,7 +81,41 @@
 
     </main>
 
+    <script>
+      anychart.onDocumentReady(function () {
+    var dataSet = [
+      {name: "Galaxies", children: [
+        {name: "Elliptical", children: [
+          {name: "IC 1101", value: 4000000},
+          {name: "Hercules A", value: 1500000},
+          {name: "A2261-BCG", value: 1000000},
+          {name: "ESO 306-17", value: 1000000},
+          {name: "ESO 444-46", value: 402200},
+        ]},
+        {name: "Spiral", children: [	
+          {name: "Rubin's Galaxy", value: 832000},
+          {name: "Comet Galaxy", value: 600000},
+          {name: "Condor Galaxy", value: 522000},
+          {name: "Tadpole Galaxy", value: 280000},
+          {name: "Andromeda Galaxy", value: 220000} 
+        ]}
+      ]}
+    ];
     
+    //  create the treemap chart and set the data
+    var chart = anychart.treeMap(dataSet, "as-tree");
+
+    // set the chart title
+    chart.title("The 10 Largest Galaxies in the Known Universe");
+
+    // set the container id for the chart
+    chart.container("tree");
+
+    // initiate drawing the chart
+    chart.draw();
+
+});
+    </script>
 
 
     

@@ -81,5 +81,5 @@ export const getDistanceAndDirection = (rawGuess, rawTarget) => {
   return [guess.distanceFrom(target), degToDir(guess.azimuthFrom(target))];
 }
 
-brazil = ["name": "Brazil",-14.235004, -51.92528]
-console.log(getDistanceAndDirection(,))
+//brazil = ["name": "Brazil",-14.235004, -51.92528]
+//console.log(getDistanceAndDirection(,))

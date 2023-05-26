@@ -1,5 +1,5 @@
 import { cities } from './data.js';
-import { getDistanceAndDirection } from './geo.js';
+import { getDistanceAndDirection } from './newgeo.js';
 
 let BULLSEYE = Math.floor(Math.random() * cities.length);
 const GUESS_INPUT = document.querySelector("input[id='hy']");
@@ -117,7 +117,7 @@ const processGuess = (e) => {
 
   if (guess !== target) {
     const [distance, direction] = getDistanceAndDirection(guess, target);
-    const msg = `${city} (${direction} ${distance.toFixed(2)} micro meters)`;
+    const msg = `${city} (${direction} ${distance.toFixed(2)} km)`;
     
     addTry(msg, "true");
     
