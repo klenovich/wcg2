@@ -50,7 +50,6 @@ const degToDir = (d) => {
 export const getDistanceAndDirection = (rawGuess, rawTarget) => {
   const guess = new City(rawGuess);
   const target = new City(rawTarget);
-  return [guess.haversineDistanceFrom(target), degToDir(guess.initialBearingTo(target))];
+  return [guess.haversineDistanceFrom(target), guess.initialBearingTo(target)];
 }
 
-s 
