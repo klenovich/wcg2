@@ -483,28 +483,38 @@ function updateInventory() {
   inventoryList.innerHTML = '';
 
   for (let hat of inventory) {
-      const listItem = document.createElement('li');
-      const sellButton = document.createElement('button');
+    const listItem = document.createElement('li');
+    const sellButton = document.createElement('button');
 
-      listItem.textContent = `Hat ${hat.id + 1}: ${hat.price.toFixed(0)} coins x${hat.quantity} `;
+    listItem.textContent = `Hat ${hat.id + 1}: ${hat.price.toFixed(0)} coins x${hat.quantity} `;
 
-      sellButton.textContent = 'Sell';
-      sellButton.onclick = () => {
-          inventory[hat.id].quantity -= 1;
-          coins += hat.price;
-          setCookie("coins", coins);
-          updateCoinDisplay(coins);
-          if (!inventory[hat.id].quantity) {
-              inventory.splice(hat.id, 1);
-          }
-          updateInventory();
+    sellButton.textContent = 'Sell';
+    // eslint-disable-next-line no-loop-func
+    sellButton.onclick = (function(hat) { // Use a closure to create a new scope for 'hat'
+      return function() {
+        inventory[hat.id].quantity -= 1;
+        coins += hat.price;
+        setCookie("coins", coins);
+        updateCoinDisplay(coins);
+        if (!inventory[hat.id].quantity) {
+          inventory.splice(hat.id, 1);
+        }
+        updateInventory();
       };
-      listItem.appendChild(sellButton);
-      inventoryList.appendChild(listItem);
+    })(hat); // Pass 'hat' as an argument to the closure
+
+    listItem.appendChild(sellButton);
+    inventoryList.appendChild(listItem);
   }
 }
 
-
+const openHatStockMarket = () => {
+  // Add your code for opening the hat stock market here
+};
+const hatStockMarketButton = document.createElement('button');
+hatStockMarketButton.textContent = 'Open Hat Stock Market';
+hatStockMarketButton.onclick = openHatStockMarket;
+document.body.appendChild(hatStockMarketButton);
 
 window.addEventListener('DOMContentLoaded', () => {
   createHats(coinRange);
