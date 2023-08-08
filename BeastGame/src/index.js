@@ -532,3 +532,29 @@ window.addEventListener('DOMContentLoaded', () => {
   }, 5000);
   updateStockTicker();
 });
+
+const updatePrices = (prices) => {
+  // Implement the logic to update the prices here
+  // For example, you can multiply each price by a random factor
+  const updatedPrices = prices.map(price => price * Math.random());
+  return updatedPrices;
+};
+
+// Place the updatePrices function before the code block where it is used
+
+window.addEventListener('DOMContentLoaded', () => {
+  createHats(coinRange);
+  const hatStockMarketButton = document.createElement('button');
+  hatStockMarketButton.textContent = 'Open Hat Stock Market';
+  hatStockMarketButton.onclick = openHatStockMarket;
+  document.body.appendChild(hatStockMarketButton);
+
+  setInterval(() => {
+    hats = hats.map(hat => {
+      const newPrice = updatePrices([hat.price])[0];
+      return { ...hat, price: newPrice };
+    });
+    updateStockTicker();
+  }, 5000);
+  updateStockTicker();
+});
