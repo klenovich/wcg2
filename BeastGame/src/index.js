@@ -558,3 +558,139 @@ window.addEventListener('DOMContentLoaded', () => {
   }, 5000);
   updateStockTicker();
 });
+
+// Define variables and select DOM elements
+let coins = 100;
+const coinDisplay = document.getElementById('coinDisplay');
+const hatStoreButton = document.getElementById('openHatStoreButton');
+const hatInventory = {};
+
+// Function to update the coin display
+const updateCoinDisplay = (coins) => {
+  coinDisplay.textContent = coins;
+};
+
+// Function to buy a hat
+const buyHat = (hatId) => {
+  const hatPrice = currentHatPrices[hatId];
+  if (coins >= hatPrice) {
+    coins -= hatPrice;
+    setCookie("coins", coins);
+    updateCoinDisplay(coins);
+
+    if (hatsInventory[hatId]) {
+      hatsInventory[hatId]++;
+    } else {
+      hatsInventory[hatId] = 1;
+    }
+    setCookie("hatsInventory", JSON.stringify(hatsInventory));
+    displayInventory();
+
+    alert(`You bought a hat: ${hatId}`);
+  } else {
+    alert('Not enough coins!');
+  }
+};
+
+// Function to sell a hat
+const sellHat = (hatId) => {
+  if (hatsInventory[hatId]) {
+    hatsInventory[hatId]--;
+
+    let hatPrice = currentHatPrices[hatId];
+    coins += hatPrice;
+    setCookie("coins", coins);
+    updateCoinDisplay(coins);
+
+    alert(`You sold a hat: ${hatId} for ${hatPrice}`);
+    if (hatsInventory[hatId] === 0) {
+      delete hatsInventory[hatId];
+    }
+    setCookie("hatsInventory", JSON.stringify(hatsInventory));
+    displayInventory();
+  } else {
+    alert('You do not own this hat');
+  }
+};
+
+// Function to display the hat inventory
+const displayInventory = () => {
+  const inventoryElement = document.querySelector("#hat-inventory");
+  inventoryElement.innerHTML = '';
+
+  for (const hatId in hatsInventory) {
+    const hatElement = document.createElement("div");
+    hatElement.classList.add("hat-item");
+
+    const hatCount = hatsInventory[hatId];
+    const hatDataElement = document.querySelector(`.hat[data-id="${hatId}"]`);
+    const hatName = hatDataElement.querySelector("h3").textContent;
+    const hatImagePath = hatDataElement.querySelector("img").src;
+
+    hatElement.innerHTML = `
+      <img src="${hatImagePath}" alt="${hatName}" class="hat-image">
+      <strong>Hat: </strong> ${hatName}<br>
+      <strong>Quantity: </strong> ${hatCount}<br>
+      <button class="select-hat" data-hat-id="${hatId}" data-hat-image="${hatImagePath}">Select</button> 
+      <button class="sell-hat" data-hat-id="${hatId}" data-hat-price="${hatDataElement.dataset.price}">Sell</button>
+    `;
+
+    inventoryElement.appendChild(hatElement);
+  }
+
+  // Update event listeners for select and sell buttons
+  updateSelectAndSellButtons();
+};
+
+// Function to update event listeners for select and sell buttons
+const updateSelectAndSellButtons = () => {
+  const selectButtons = document.querySelectorAll(".select-hat");
+  const sellButtons = document.querySelectorAll(".sell-hat");
+
+  selectButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const hatId = button.dataset.hatId;
+      const hatImagePath = button.dataset.hatImage;
+      selectHat(hatId, hatImagePath);
+    });
+  });
+
+  sellButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const hatId = button.dataset.hatId;
+      sellHat(hatId);
+    });
+  });
+};
+
+// Function to select a hat
+const selectHat = (hatId, hatImagePath) => {
+  const activeHatElement = document.querySelector("#active-hat");
+  activeHatElement.innerHTML = `<img src="${hatImagePath}" alt="Hat ${hatId}" class="hat-image">`;
+};
+
+// Function to share a hat with friends
+const shareHatWithFriends = (hatId, hatName) => {
+  alert(`Sharing ${hatName} with friends!`);
+};
+
+// Function to open the hat stock market
+const openHatStockMarket = () => {
+  // Add your code for opening the hat stock market here
+};
+
+// Event listener for opening the hat store
+hatStoreButton.addEventListener('click', () => {
+  document.querySelector('#hat-store').classList.add('open');
+});
+
+// Event listener for closing the hat store
+document.querySelector('.close-hat-store').addEventListener('click', () => {
+  document.querySelector('#hat-store').classList.remove('open');
+});
+
+// Load and display the user's inventory when the page loads
+displayInventory();
+
+// Add event listeners for buying hats
+const buy
